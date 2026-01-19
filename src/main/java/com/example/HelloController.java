@@ -42,7 +42,6 @@ public class HelloController {
         }
     }
 
-    // SQL sample
     @RequestMapping("calc")
     Result calc(@RequestParam int left, @RequestParam int right) {
         // Return a hardcoded result instead of querying the database
