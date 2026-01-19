@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container-wrapper {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .card-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        .hello-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .hello-message {
+            font-size: 2em;
+            font-weight: 600;
+            color: #764ba2;
+            margin: 0;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .calc-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .input-group-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn-calculate {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        .btn-reset {
+            background: #e9ecef;
+            color: #495057;
+            border: 2px solid #dee2e6;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: #dee2e6;
+            border-color: #adb5bd;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .result-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .result-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loader.show {
+            display: block;
+        }
+
+        .spinner-border {
+            color: #667eea;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+            border: 2px solid #f5c6cb;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+            border: 2px solid #c3e6cb;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .input-group-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .result-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-wrapper">
+        <div class="card-container">
+            <!-- Header -->
+            <div class="header">
+                <h1><i class="bi bi-calculator"></i> Calculator</h1>
+                <p>Simple and elegant calculation tool</p>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Hello Section -->
+                <div class="hello-section">
+                    <p class="hello-message" id="helloMessage">Welcome!</p>
+                </div>
+
+                <!-- Fetch Hello Section -->
+                <div class="section">
+                    <div class="section-title">
+                        <i class="bi bi-chat-dots"></i>
+                        Get Message
+                    </div>
+                    <button class="btn-calculate" onclick="fetchHello()" style="width: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); margin-bottom: 15px;">
+                        <i class="bi bi-arrow-right-circle"></i> Fetch Hello Message
+                    </button>
+                </div>
+
+                <!-- Calculator Section -->
+                <div class="section">
+                    <div class="section-title">
+                        <i class="bi bi-plus-circle"></i>
+                        Add Two Numbers
+                    </div>
+
+                    <div class="calc-section">
+                        <div class="input-group-wrapper">
+                            <div class="form-group">
+                                <label class="form-label" for="leftNumber">
+                                    <i class="bi bi-1-circle"></i> First Number
+                                </label>
+                                <input type="number" class="form-control" id="leftNumber" placeholder="Enter first number" value="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="rightNumber">
+                                    <i class="bi bi-2-circle"></i> Second Number
+                                </label>
+                                <input type="number" class="form-control" id="rightNumber" placeholder="Enter second number" value="200">
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button class="btn-calculate" onclick="calculateSum()">
+                                <i class="bi bi-calculator"></i> Calculate
+                            </button>
+                            <button class="btn-reset" onclick="resetCalculator()">
+                                <i class="bi bi-arrow-clockwise"></i> Reset
+                            </button>
+                        </div>
+
+                        <!-- Loader -->
+                        <div class="loader" id="loader">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+
+                        <!-- Result Box -->
+                        <div class="result-box" id="resultBox">
+                            <div class="result-row">
+                                <div class="result-item">
+                                    <div class="result-label">Left</div>
+                                    <div class="result-value" id="resultLeft">-</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">Right</div>
+                                    <div class="result-value" id="resultRight">-</div>
+                                </div>
+                                <div class="result-item">
+                                    <div class="result-label">Sum</div>
+                                    <div class="result-value" id="resultAnswer">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Messages -->
+                        <div class="error-message" id="errorMessage"></div>
+                        <div class="success-message" id="successMessage"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Fetch Hello Message
+        async function fetchHello() {
+            try {
+                showLoader();
+                const response = await fetch('http://localhost:8080/');
+                const text = await response.text();
+                document.getElementById('helloMessage').textContent = text;
+                showSuccess('Message fetched successfully!');
+                hideLoader();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to fetch message: ' + error.message);
+                hideLoader();
+            }
+        }
+
+        // Calculate Sum
+        async function calculateSum() {
+            const left = document.getElementById('leftNumber').value;
+            const right = document.getElementById('rightNumber').value;
+
+            // Validation
+            if (!left || !right) {
+                showError('Please enter both numbers');
+                return;
+            }
+
+            try {
+                showLoader();
+                const response = await fetch(`http://localhost:8080/calc?left=${left}&right=${right}`);
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                
+                // Display results
+                document.getElementById('resultLeft').textContent = data.left;
+                document.getElementById('resultRight').textContent = data.right;
+                document.getElementById('resultAnswer').textContent = data.answer;
+                
+                document.getElementById('resultBox').classList.add('show');
+                hideError();
+                showSuccess('Calculation completed successfully!');
+                hideLoader();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Failed to calculate: ' + error.message);
+                hideLoader();
+            }
+        }
+
+        // Reset Calculator
+        function resetCalculator() {
+            document.getElementById('leftNumber').value = '100';
+            document.getElementById('rightNumber').value = '200';
+            document.getElementById('resultBox').classList.remove('show');
+            hideError();
+            hideSuccess();
+        }
+
+        // Helper Functions
+        function showLoader() {
+            document.getElementById('loader').classList.add('show');
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').classList.remove('show');
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.classList.add('show');
+            setTimeout(hideSuccess, 3000);
+        }
+
+        function hideSuccess() {
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            fetchHello();
+        });
+    </script>
+</body>
+</html>
